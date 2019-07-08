@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="android.primer.bryanalvarez.captura_info_gt">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <application
+        android:name=".Initializer"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_logo_ezgo"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_logo_ezgo"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+        <provider
+            android:name=".MyFileProvider"
+            android:authorities="${applicationId}.filepicker_provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/nnf_provider_paths" />
+        </provider>
+
+        <activity
+            android:name=".Activities.MainActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name=".Splash.SplashActivity"
+            android:theme="@style/SplashScreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Activities.LoginActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name=".Activities.VehiculosActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activities.CotizarActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name=".Activities.MenuActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activities.MaquinasActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activities.CotizarMaquinaActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name=".Activities.CotizacionesMaquinariaActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name=".Activities.VerCotizacionActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name=".Activities.ActualizarActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name=".Activities.CrearActualizarMaquinaActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name=".Activities.ModificarFiltroActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name="com.nononsenseapps.filepicker.FilePickerActivity"
+            android:label="@string/app_name"
+            android:theme="@style/FilePickerTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Activities.CotizarRepuestosActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name=".Activities.CotizacionesRepuestosActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name=".Activities.CrearActualizarVehiculoActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name=".Activities.ModificarFiltroVehiculosActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name=".Activities.VerCotizacionVehiculosActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name=".Activities.ArrendamientoActivity"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Activities.ArrendarVehiculoActivity"
+            android:theme="@style/Others" />
+        <activity
+            android:name=".Activities.CotizacionesArrendamientosActivity"
+            android:theme="@style/Others" />
+        <activity android:name=".Activities.VerCotizacionArrendamientoActivity"
+            android:theme="@style/Others"></activity>
+    </application>
+
+</manifest>

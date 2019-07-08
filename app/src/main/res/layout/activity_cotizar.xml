@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="android.primer.bryanalvarez.captura_info_gt.Activities.CotizarActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="10dp">
+            <ImageView
+                android:id="@+id/iv_vehiculo_cotizar"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:src="@drawable/prueba"/>
+            <ImageView
+                android:id="@+id/iv_marca"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:src="@drawable/ezgo"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:textSize="30dp"
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp"
+                android:text="Cotización"
+                android:layout_marginTop="16dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="10dp">
+
+            <CheckBox
+                android:id="@+id/cb_list_view_Bomper_frontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bomper frontal"/>
+
+            <CheckBox
+                android:id="@+id/cb_list_view_Botella_arena"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Botella de arena"/>
+
+            <CheckBox
+                android:id="@+id/cb_list_view_Forro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Forro para el vehiculo"/>
+
+            <CheckBox
+                android:id="@+id/cb_list_view_luces"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kit de luces LED"/>
+
+            <CheckBox
+                android:id="@+id/cb_list_view_Lava_bolas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lava bolas"/>
+
+            <CheckBox
+                android:id="@+id/cb_list_view_Nevera"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nevera / Cooler"/>
+
+            <CheckBox
+                android:id="@+id/cb_list_view_Porta_talegas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Porta talegas"/>
+
+            <CheckBox
+                android:id="@+id/cb_list_view_Puerto_USB"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Puerto USB"/>
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:visibility="visible"
+            android:id="@+id/listViewAccesorios"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_margin="10dp">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Subtotal:"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:layout_marginRight="10dp"
+                android:textColor="#9e9d9d"/>
+            <TextView
+                android:id="@+id/tv_total_cotizar_sin_iva"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$0"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:textColor="#9e9d9d"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="IVA:"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:layout_marginRight="10dp"
+                android:textColor="#9e9d9d"/>
+            <TextView
+                android:id="@+id/tv_total_cotizar_iva"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$0"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:textColor="#9e9d9d"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Total:"
+                android:textSize="25dp"
+                android:textStyle="bold"
+                android:layout_marginRight="10dp"/>
+            <TextView
+                android:id="@+id/tv_total_cotizar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$0"
+                android:textSize="25dp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/bt_cotizar"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Continuar"
+            android:layout_margin="0dp"
+            android:layout_marginBottom="0dp"
+            android:textColor="@color/colorWhite"
+            android:background="@color/colorPrimary"/>
+
+    </LinearLayout>
+
+
+
+
+
+</ScrollView>

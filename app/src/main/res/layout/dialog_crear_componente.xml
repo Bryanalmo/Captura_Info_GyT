@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="19dp"
+        android:layout_marginBottom="10dp"
+        android:text="Ingrese los datos del componente a crear"
+        android:textSize="17dp"/>
+
+    <EditText
+        android:id="@+id/et_dialog_referencia_componente"
+        android:layout_marginLeft="15dp"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:hint="Referencia" />
+
+    <EditText
+        android:id="@+id/et_dialog_nombre_componente"
+        android:layout_marginLeft="15dp"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:hint="Nombre" />
+
+    <EditText
+        android:id="@+id/et_dialog_descripcion_componente"
+        android:layout_marginLeft="15dp"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:hint="Descripción" />
+
+    <EditText
+        android:id="@+id/et_dialog_precio_componente"
+        android:layout_marginLeft="15dp"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="Precio (Sin IVA)" />
+
+    <EditText
+        android:id="@+id/et_dialog_IVA_componente"
+        android:layout_marginLeft="15dp"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:hint="IVA" />
+
+</LinearLayout>
