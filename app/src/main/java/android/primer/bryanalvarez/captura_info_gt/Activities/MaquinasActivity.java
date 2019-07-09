@@ -61,6 +61,7 @@ public class MaquinasActivity extends AppCompatActivity {
     private FrameLayout frame_layout_num_maquinas;
     private FloatingActionButton floatingActionButtonNumMaquinas;
     private FloatingActionButton fab_ver_cotizaciones;
+    private FloatingActionButton fab_cotizar_best_product;
     private TextView tv_num_maquinas;
     private Maquinas_Adapter adapter_maquinas;
     private ArrayList<Maquina> maquinas = new ArrayList<>();
@@ -91,6 +92,7 @@ public class MaquinasActivity extends AppCompatActivity {
         frame_layout_num_maquinas = (FrameLayout) findViewById(R.id.frame_layout_num_maquinas);
         floatingActionButtonNumMaquinas = (FloatingActionButton) findViewById(R.id.floatingActionButtonNumMaquinas);
         fab_ver_cotizaciones = (FloatingActionButton) findViewById(R.id.fab_ver_cotizaciones);
+        fab_cotizar_best_product = (FloatingActionButton) findViewById(R.id.fab_cotizar_best_product);
         tv_num_maquinas = (TextView) findViewById(R.id.tv_num_maquinas);
         spinner_funciones = (Spinner) findViewById(R.id.spinner_funciones);
         gridViewMaquinas = (RecyclerView) findViewById(R.id.gridViewMaquinas);
@@ -120,6 +122,15 @@ public class MaquinasActivity extends AppCompatActivity {
                 alertDialog_cargando.show();
             }
         });
+
+
+        fab_cotizar_best_product.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findBestProduct();
+            }
+        });
+
         fab_ver_cotizaciones.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -148,6 +159,18 @@ public class MaquinasActivity extends AppCompatActivity {
         registerForContextMenu(gridViewMaquinas);
         hideShowNumMaquinas();
         setHideShowFABs();
+    }
+
+    private void findBestProduct() {
+        for (int i = 0; i < maquinas.size(); i++) {
+            if(maquinas.get(i).isBest_product()){
+                Intent intent = new Intent(MaquinasActivity.this, CotizarMaquinaActivity.class);
+                Util.setMaquina(maquinas.get(i));
+                intent.putExtra("Id_maquina", maquinas.get(i).getId());
+                intent.putExtra("Crear_Editar", "Crear_Best_product");
+                startActivity(intent);
+            }
+        }
     }
 
     @Override
@@ -534,6 +557,7 @@ public class MaquinasActivity extends AppCompatActivity {
                 String Imagen_equipo;
                 long Precio_IVA;
                 long Aumento_IVA;
+                boolean Best_product;
 
                 try {
                     jsonArray = new JSONArray(response);
@@ -555,6 +579,7 @@ public class MaquinasActivity extends AppCompatActivity {
                         Precio = (int) (Precio * Util.monedaActual);
                         Aumento_IVA = (long) (Precio*IVA);
                         Precio_IVA = (long) (Precio + (Aumento_IVA));
+                        Best_product = jsonArray.getJSONObject(i).getBoolean("Best_product");
 
                         maquina = new Maquina();
 
@@ -573,6 +598,7 @@ public class MaquinasActivity extends AppCompatActivity {
                         maquina.setMarca_motor(Marca_motor);
                         maquina.setMarca(Marca);
                         maquina.setImagen_equipo(Imagen_equipo);
+                        maquina.setBest_product(Best_product);
 
                         maquinas_WS.add(maquina);
                     }

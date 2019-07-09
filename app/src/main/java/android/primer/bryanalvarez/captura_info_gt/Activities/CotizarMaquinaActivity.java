@@ -20,6 +20,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -53,6 +54,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class CotizarMaquinaActivity extends AppCompatActivity {
 
@@ -113,8 +115,12 @@ public class CotizarMaquinaActivity extends AppCompatActivity {
 
         bindUI();
 
-        if (editar_crear.equals("Crear")){
-            linear_layout_cliente_contacto.setVisibility(View.VISIBLE);
+        if (editar_crear.equals("Crear") || editar_crear.equals("Crear_Best_product")){
+            if (editar_crear.equals("Crear")){
+                linear_layout_cliente_contacto.setVisibility(View.VISIBLE);
+            }else{
+                linear_layout_cliente_contacto.setVisibility(View.GONE);
+            }
             bt_cotizar_maquina.setText("ENVIAR");
         }else if (editar_crear.equals("Editar")){
             linear_layout_cliente_contacto.setVisibility(View.GONE);
@@ -142,7 +148,7 @@ public class CotizarMaquinaActivity extends AppCompatActivity {
                     alertDialog_cargando.setButton(DialogInterface.BUTTON_NEGATIVE, "No", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            showAlertDetallesCorreo();
+                            showAlertDetallesCorreo(null,null);
                         }
                     });
                     alertDialog_cargando.show();
@@ -167,6 +173,9 @@ public class CotizarMaquinaActivity extends AppCompatActivity {
                         }
                     });
                     alertDialog_cargando.show();
+                }else if (editar_crear.equals("Crear_Best_product")){
+                    agregarSubCotizacion();
+                    showAlertDatosCliente("Datos","Ingresa los datos del cliente");
                 }
 
             }
@@ -231,6 +240,53 @@ public class CotizarMaquinaActivity extends AppCompatActivity {
 
     }
 
+    private void showAlertDatosCliente(String title, String message) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        if (title != null) builder.setTitle(title);
+        if (message != null) builder.setMessage(message);
+
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_datos_cliente_best_product, null);
+        builder.setView(viewInflated);
+
+        final EditText et_dialog_nombre_cliente = (EditText) viewInflated.findViewById(R.id.et_dialog_nombre_cliente);
+        final EditText et_dialog_correo_cliente = (EditText) viewInflated.findViewById(R.id.et_dialog_correo_cliente);
+        final CheckBox cb_tratamiento_datos= (CheckBox) viewInflated.findViewById(R.id.cb_tratamiento_datos);
+
+        builder.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String nombre = et_dialog_nombre_cliente.getText().toString();
+                String correo = et_dialog_correo_cliente.getText().toString().replace(" ","");
+                if(cb_tratamiento_datos.isChecked()){
+                    if (correo.isEmpty()){
+                        Toast.makeText(CotizarMaquinaActivity.this,"Llene el campo Correo",Toast.LENGTH_SHORT).show();
+                    }else{
+                        if (!validarEmail(correo)){
+                            Toast.makeText(CotizarMaquinaActivity.this,"Email no valido",Toast.LENGTH_SHORT).show();
+                            et_dialog_correo_cliente.setError("Email no válido");
+                        }else {
+                            showAlertDetallesCorreo(nombre,correo);
+                            dialog.dismiss();
+                        }
+                    }
+                }else{
+                    Toast.makeText(CotizarMaquinaActivity.this,"Por favor apruebe el tratamiento de datos",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+
+    }
+
+    private boolean validarEmail(String email) {
+        Pattern pattern = Patterns.EMAIL_ADDRESS;
+        return pattern.matcher(email).matches();
+    }
+
     private void cargarCliente() {
         if (Util.getCotizaciones_maquinas().size()>0){
             for (int i = 0; i < clientes.size(); i++) {
@@ -293,7 +349,7 @@ public class CotizarMaquinaActivity extends AppCompatActivity {
     private void agregarSubCotizacion() {
         String id_modelo_maquina = id_maquina;
         SubCotizacion subCotizacionAgregada;
-        if (editar_crear.equals("Crear")){
+        if (editar_crear.equals("Crear") || editar_crear.equals("Crear_Best_product")){
             subCotizacionAgregada = new SubCotizacion(id_modelo_maquina,valor_final,componentes_select);
             Util.cotizaciones_maquinas.add(subCotizacionAgregada);
         }else if (editar_crear.equals("Editar")){
@@ -827,7 +883,7 @@ public class CotizarMaquinaActivity extends AppCompatActivity {
 
     }
 
-    private void showAlertDetallesCorreo() {
+    private void showAlertDetallesCorreo(final String nombre, final String correo) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -853,7 +909,7 @@ public class CotizarMaquinaActivity extends AppCompatActivity {
                 String asunto = et_asunto_correo.getText().toString();
                 String cuerpo = et_cuerpo_correo.getText().toString();
                 //Toast.makeText(CotizarRepuestosActivity.this, formaPago, Toast.LENGTH_SHORT).show();
-                crear_cotizacion_WebService(asunto,cuerpo);
+                crear_cotizacion_WebService(asunto,cuerpo, nombre, correo);
                 alertDialog_cargando = new AlertDialog.Builder(CotizarMaquinaActivity.this).create();
                 alertDialog_cargando.setMessage("Enviando datos");
                 alertDialog_cargando.setCancelable(false);
@@ -933,9 +989,9 @@ public class CotizarMaquinaActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void crear_cotizacion_WebService(final String asunto, final String cuerpo){
+    private void crear_cotizacion_WebService(final String asunto, final String cuerpo, final String nombre, final String correo){
 
-        String url = "https://golfyturf.com/feria_automovil/AppWebServices/crear_cotizacion_maquina.php";
+        String url = "https://golfyturf.com/feria_automovil/AppWebServices/crear_cotizacion_maquina_prueba.php";
         url = url.replace(" ", "%20");
 
         stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -954,9 +1010,10 @@ public class CotizarMaquinaActivity extends AppCompatActivity {
                         Intent intent = new Intent(CotizarMaquinaActivity.this,CotizacionesMaquinariaActivity.class);
                         startActivity(intent);
                     }else{
-                        Toast.makeText(CotizarMaquinaActivity.this, "Error al enviar los datos", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CotizarMaquinaActivity.this, "Error al enviar los datos", Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
+                    Toast.makeText(CotizarMaquinaActivity.this, "Error j "+e.getMessage() , Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                     Util.cotizaciones_maquinas.clear();
                     Util.contactos_agregados.clear();
@@ -970,9 +1027,12 @@ public class CotizarMaquinaActivity extends AppCompatActivity {
                 if (error instanceof TimeoutError){
                     Util.cotizaciones_maquinas.clear();
                     Util.contactos_agregados.clear();
-                    Toast.makeText(CotizarMaquinaActivity.this, "Creación exitosa, un email será enviado en breve.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CotizarMaquinaActivity.this, "Creación exitosa, un email será enviado en breve.", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(CotizarMaquinaActivity.this,CotizacionesMaquinariaActivity.class);
                     startActivity(intent);
+                }else{
+                    Util.cotizaciones_maquinas.clear();
+                    Toast.makeText(CotizarMaquinaActivity.this, "Error res " + error.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         }){
@@ -980,8 +1040,13 @@ public class CotizarMaquinaActivity extends AppCompatActivity {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> parametros = new HashMap<>();
                 long valor_total = 0;
-                parametros.put("Id_cliente", idCliente );
-                parametros.put("Id_contacto", idContacto);
+                if(nombre == null){
+                    parametros.put("Id_cliente", idCliente );
+                    parametros.put("Id_contacto", idContacto);
+                }else{
+                    parametros.put("Nombre_cliente", nombre );
+                    parametros.put("Correo_cliente", correo);
+                }
                 parametros.put("Id_comercial", Util.getId_usuario() );
                 parametros.put("Asunto", asunto );
                 parametros.put("Cuerpo", cuerpo );

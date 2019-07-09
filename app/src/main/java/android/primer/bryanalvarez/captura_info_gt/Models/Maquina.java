@@ -21,6 +21,7 @@ public class Maquina {
     private String Imagen_equipo;
     private boolean agregado;
     private String Descripcion;
+    private boolean best_product;
 
     public String getId() {
         return Id;
@@ -148,5 +149,13 @@ public class Maquina {
 
     public void setDescripcion(String descripcion) {
         Descripcion = descripcion;
+    }
+
+    public boolean isBest_product() {
+        return best_product;
+    }
+
+    public void setBest_product(boolean best_product) {
+        this.best_product = best_product;
     }
 }

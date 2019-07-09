@@ -88,6 +88,15 @@ tools:context="android.primer.bryanalvarez.captura_info_gt.Activities.MaquinasAc
         </FrameLayout>
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_cotizar_best_product"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|left"
+            android:backgroundTint="@color/colorPrimary"
+            android:src="@mipmap/ic_tractor"/>
+
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_ver_cotizaciones"
             android:layout_width="wrap_content"
             android:layout_marginTop="10dp"
