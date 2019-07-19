@@ -21,4 +21,10 @@
         app:showAsAction="never">
 
     </item>
+    <item
+        android:id="@+id/menu_vehiculos_modificar_precios"
+        android:title="Modificar precios"
+        app:showAsAction="never">
+
+    </item>
 </menu>

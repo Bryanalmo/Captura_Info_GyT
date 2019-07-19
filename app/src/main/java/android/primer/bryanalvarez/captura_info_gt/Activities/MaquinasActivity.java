@@ -75,6 +75,7 @@ public class MaquinasActivity extends AppCompatActivity {
     private ArrayList<Accesorio_Maquina> accesorios = new ArrayList<>();
 
     private String idComponente_Accesorio="";
+    String enviar_guardar = "";
 
     RequestQueue request;
     StringRequest stringRequest;
@@ -110,7 +111,7 @@ public class MaquinasActivity extends AppCompatActivity {
                 alertDialog_cargando.setButton(DialogInterface.BUTTON_POSITIVE, "Continuar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        showAlertDetallesCorreo();
+                        confirmarEnvio();
                     }
                 });
                 alertDialog_cargando.setButton(DialogInterface.BUTTON_NEGATIVE, "Volver", new DialogInterface.OnClickListener() {
@@ -547,6 +548,7 @@ public class MaquinasActivity extends AppCompatActivity {
                 String Referencia;
                 String Descripcion = "";
                 int Precio;
+                int Precio_dolares;
                 double IVA;
                 String Link;
                 String Informacion_tecnica;
@@ -558,6 +560,7 @@ public class MaquinasActivity extends AppCompatActivity {
                 long Precio_IVA;
                 long Aumento_IVA;
                 boolean Best_product;
+                double Descuento;
 
                 try {
                     jsonArray = new JSONArray(response);
@@ -568,6 +571,7 @@ public class MaquinasActivity extends AppCompatActivity {
                         Descripcion = jsonArray.getJSONObject(i).getString("Descripcion");
                         Modelo_maquina = jsonArray.getJSONObject(i).getString("Modelo_maquina");
                         Precio = jsonArray.getJSONObject(i).getInt("Precio");
+                        Precio_dolares = jsonArray.getJSONObject(i).getInt("Precio");
                         IVA = jsonArray.getJSONObject(i).getDouble("IVA");
                         Link = jsonArray.getJSONObject(i).getString("Link");
                         Informacion_tecnica = jsonArray.getJSONObject(i).getString("Informacion_tecnica");
@@ -580,6 +584,7 @@ public class MaquinasActivity extends AppCompatActivity {
                         Aumento_IVA = (long) (Precio*IVA);
                         Precio_IVA = (long) (Precio + (Aumento_IVA));
                         Best_product = jsonArray.getJSONObject(i).getBoolean("Best_product");
+                        Descuento = jsonArray.getJSONObject(i).getDouble("Descuento");
 
                         maquina = new Maquina();
 
@@ -599,6 +604,8 @@ public class MaquinasActivity extends AppCompatActivity {
                         maquina.setMarca(Marca);
                         maquina.setImagen_equipo(Imagen_equipo);
                         maquina.setBest_product(Best_product);
+                        maquina.setDescuento(Descuento);
+                        maquina.setPrecio_dolares(Precio_dolares);
 
                         maquinas_WS.add(maquina);
                     }
@@ -686,7 +693,7 @@ public class MaquinasActivity extends AppCompatActivity {
                         Id = jsonArray.getJSONObject(i).getString("Id");
                         Nombre = jsonArray.getJSONObject(i).getString("Nombre");
                         Precio = jsonArray.getJSONObject(i).getLong("Precio");
-                        Precio = (int) (Precio * Util.monedaActual);
+                        Precio = (int) (Precio);
                         IVA = jsonArray.getJSONObject(i).getDouble("IVA");
                         valor_IVA = (long) (Precio*IVA);
                         precio_IVA = Precio + valor_IVA;
@@ -739,7 +746,7 @@ public class MaquinasActivity extends AppCompatActivity {
                         Id = jsonArray.getJSONObject(i).getString("Id");
                         Nombre = jsonArray.getJSONObject(i).getString("Descripcion");
                         Precio = jsonArray.getJSONObject(i).getLong("Precio");
-                        Precio = (int) (Precio * Util.monedaActual);
+                        Precio = (int) (Precio);
                         IVA = jsonArray.getJSONObject(i).getDouble("IVA");
 
                         accesorio_maquina= new Accesorio_Maquina(Id,Nombre,Precio,IVA);
@@ -830,6 +837,34 @@ public class MaquinasActivity extends AppCompatActivity {
         request.add(stringRequest);
     }
 
+    private void confirmarEnvio(){
+        AlertDialog alertDialog = new AlertDialog.Builder(MaquinasActivity.this).create();
+        alertDialog.setMessage("¿Desea solo guardar la cotización o enviarla ahora?");
+        alertDialog.setCancelable(false);
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Enviar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                enviar_guardar = "2";
+                showAlertDetallesCorreo();
+            }
+        });
+        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Guardar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                enviar_guardar = "1";
+                crear_cotizacion_WebService("","");
+                alertDialog_cargando = new AlertDialog.Builder(MaquinasActivity.this).create();
+                alertDialog_cargando.setMessage("Guardando datos");
+                alertDialog_cargando.setCancelable(false);
+                alertDialog_cargando.setCanceledOnTouchOutside(false);
+                alertDialog_cargando.show();
+            }
+        });
+        alertDialog.show();
+
+    }
+
     private void showAlertDetallesCorreo() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -871,9 +906,9 @@ public class MaquinasActivity extends AppCompatActivity {
 
     private void cargarAsuntoyCuerpoCorreo(EditText et_asunto_correo, EditText et_cuerpo_correo){
 
-        String cuerpo = "En Golf y Turf SAS, distribuidores autorizados para Colombia de estas marcas, agradecemos la oportunidad de presentarle esta oferta, esperando que se atractiva para usted y que sea una solución integral, de igual manera estaremos atentos a resolver cualquier duda que pueda surgir, nos puede contactar a través de los medios descritos a continuación. ";
+        String cuerpo = "En Golf & Turf SAS, distribuidores autorizados para Colombia de Jacobsen, E-Z-GO, Ventrac, entre otras reconocidas marcas, agradecemos la oportunidad de presentarle esta oferta, esperando que se atractiva para usted y que provea una solución integral a sus necesidades. Estaremos atentos a resolver cualquier inquietud que pueda surgir de la misma. A continuación presentaremos los medios a través de los cuales puede comunicarse con nosotros: ";
         et_cuerpo_correo.setText(cuerpo);
-        String asunto = "Cotizacion Maquinaria G&T";
+        String asunto = "Propuesta Maquinaria G&T";
         et_asunto_correo.setText(asunto);
     }
 
@@ -921,6 +956,8 @@ public class MaquinasActivity extends AppCompatActivity {
                 long valor_total = 0;
                 parametros.put("Id_cliente", Util.getCliente().getId());
                 parametros.put("Id_contacto", Util.getContacto().getId());
+                parametros.put("Enviar_guardar", enviar_guardar);
+                parametros.put("Numero_cot", " ");
                 parametros.put("Id_comercial", Util.getId_usuario() );
                 parametros.put("Asunto", asunto );
                 parametros.put("Cuerpo", cuerpo );

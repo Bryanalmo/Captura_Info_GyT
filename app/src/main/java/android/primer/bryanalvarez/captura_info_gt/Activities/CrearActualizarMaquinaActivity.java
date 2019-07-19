@@ -75,6 +75,8 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 
+import static java.lang.Math.round;
+
 public class CrearActualizarMaquinaActivity extends AppCompatActivity {
 
     private ImageView iv_imagen_maquina_act_crear;
@@ -84,6 +86,7 @@ public class CrearActualizarMaquinaActivity extends AppCompatActivity {
     private EditText et_descripcion_maquina_act_crear;
     private Spinner spinner_funcion_maquina;
     private EditText et_iva_maquina_act_crear;
+    private EditText et_descuento_maquina_act_crear;
     private TextView et_valor_final_act_crear;
     private TextView tv_titulo_act_crear;
     private RecyclerView recycler_view_componentes_act_crear;
@@ -235,6 +238,61 @@ public class CrearActualizarMaquinaActivity extends AppCompatActivity {
             }
         });
 
+        et_descuento_maquina_act_crear.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() != 0 && Double.parseDouble(s.toString()) != 0) {
+                    long precio_nuevo_sin_iva =0;
+                    long precio_nuevo_descuento = 0;
+                    double iva_maquina = 0;
+                    if(et_precio_sin_iva_maquina_act_crear.getText().toString().isEmpty()){
+                        precio_nuevo_sin_iva = 0;
+                    }else{
+                        precio_nuevo_sin_iva = Integer.parseInt(et_precio_sin_iva_maquina_act_crear.getText().toString());
+                    }
+                    if(et_iva_maquina_act_crear.getText().toString().isEmpty()){
+                        iva_maquina = 0;
+                    }else{
+                        iva_maquina = Double.parseDouble(et_iva_maquina_act_crear.getText().toString());
+                    }
+                    long precio_nuevo_iva = 0;
+                    double descuento_maquina = Double.parseDouble(s.toString()) ;
+                    precio_nuevo_iva = (long) (precio_nuevo_sin_iva + (precio_nuevo_sin_iva*iva_maquina));
+                    precio_nuevo_descuento = (long) (precio_nuevo_iva * (1-descuento_maquina));
+                    String format_valor_nuevo= NumberFormat.getInstance().format(precio_nuevo_descuento);
+                    et_valor_final_act_crear.setText("$ "+format_valor_nuevo);
+                }else{
+                    long precio_nuevo_sin_iva =0;
+                    double iva_maquina = 0;
+                    if(et_precio_sin_iva_maquina_act_crear.getText().toString().isEmpty()){
+                        precio_nuevo_sin_iva = 0;
+                    }else{
+                        precio_nuevo_sin_iva = Integer.parseInt(et_precio_sin_iva_maquina_act_crear.getText().toString());
+                    }
+                    if(et_iva_maquina_act_crear.getText().toString().isEmpty()){
+                        iva_maquina = 0;
+                    }else{
+                        iva_maquina = Double.parseDouble(et_iva_maquina_act_crear.getText().toString());
+                    }
+                    long precio_nuevo_iva = (long) (precio_nuevo_sin_iva + (precio_nuevo_sin_iva*iva_maquina));
+                    String format_valor_nuevo= NumberFormat.getInstance().format(precio_nuevo_iva);
+                    et_valor_final_act_crear.setText("$ "+format_valor_nuevo);
+
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
         iv_imagen_maquina_act_crear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -321,12 +379,15 @@ public class CrearActualizarMaquinaActivity extends AppCompatActivity {
             et_nombre_maquina_act_crear.setText(maquina.getModelo_maquina());
             et_ref_maquina_act_crear.setText(maquina.getReferencia());
             et_descripcion_maquina_act_crear.setText(maquina.getDescripcion());
-            et_precio_sin_iva_maquina_act_crear.setText(maquina.getPrecio()+"");
+            et_precio_sin_iva_maquina_act_crear.setText(maquina.getPrecio_dolares()+"");
             et_iva_maquina_act_crear.setText(maquina.getIVA()+"");
-            String format_valor= NumberFormat.getInstance().format(maquina.getPrecio_IVA());
+            long precio = (long) (maquina.getPrecio_dolares() + (maquina.getPrecio_dolares()*maquina.getIVA()));
+            long precio_descuento = (long) (precio * (1-maquina.getDescuento()));
+            String format_valor= NumberFormat.getInstance().format(precio_descuento);
             et_valor_final_act_crear.setText("$ "+format_valor);
             tv_titulo_act_crear.setText("Actualizar Máquina");
             btn_act_crear_maquina.setText("Actualizar");
+            et_descuento_maquina_act_crear.setText(maquina.getDescuento()+"");
         }
     }
 
@@ -355,6 +416,7 @@ public class CrearActualizarMaquinaActivity extends AppCompatActivity {
         itemDecoration_accesorios = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL);
         recycler_view_accesorios_act_crear.setLayoutManager(mLayoutManager_accesorios);
         recycler_view_accesorios_act_crear.addItemDecoration(itemDecoration_accesorios);
+        et_descuento_maquina_act_crear = (EditText) findViewById(R.id.et_descuento_maquina_act_crear);
     }
 
     private void hideAlertDialog() {
@@ -924,6 +986,7 @@ public class CrearActualizarMaquinaActivity extends AppCompatActivity {
                 String Descripcion_maquina = et_descripcion_maquina_act_crear.getText().toString();
                 String Precio = et_precio_sin_iva_maquina_act_crear.getText().toString();
                 String IVA = et_iva_maquina_act_crear.getText().toString();
+                String Descuento = et_descuento_maquina_act_crear.getText().toString();
                 String Imagen_maquina ="";
                 if(imagenActualizada){
                     Imagen_maquina = convertirImagenString(bitmap);
@@ -943,6 +1006,7 @@ public class CrearActualizarMaquinaActivity extends AppCompatActivity {
                 parametros.put("Descripcion", Descripcion_maquina);
                 parametros.put("Precio", Precio );
                 parametros.put("IVA", IVA );
+                parametros.put("Descuento", Descuento );
                 parametros.put("Imagen_maquina", Imagen_maquina );
                 parametros.put("Numero_componentes", componentes_maquina.size()+"" );
                 parametros.put("Numero_accesorios", accesorios_maquina.size() + "" );

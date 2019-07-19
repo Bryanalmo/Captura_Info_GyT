@@ -48,25 +48,46 @@
         android:hint="Celular" />
 
     <EditText
-        android:id="@+id/et_dialog_ciudad_cliente"
-        android:layout_marginLeft="15dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Ciudad" />
-
-    <EditText
-        android:id="@+id/et_dialog_nit_cliente"
-        android:layout_marginLeft="15dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="NIT / Cedula" />
-
-    <EditText
         android:id="@+id/et_dialog_ciudad_observaciones"
         android:layout_marginLeft="15dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Observaciones" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Interes del cliente"
+            android:textSize="17dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="18dp"/>
+
+        <TextView
+            android:id="@+id/tv_interes_cliente"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="18dp"/>
+
+    </LinearLayout>
+
+
+
+    <SeekBar
+        android:id="@+id/seekBar_interes_cliente"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:max="5"
+        android:min="0"
+        android:layout_marginBottom="10dp"/>
 
     <CheckBox
         android:id="@+id/cb_tratamiento_datos"

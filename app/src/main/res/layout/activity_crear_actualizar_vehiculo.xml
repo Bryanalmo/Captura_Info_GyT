@@ -439,10 +439,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="16dp"
             android:text="Valor final:"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/et_precio_sin_iva_vehiculo_act_crear" />
+            app:layout_constraintTop_toBottomOf="@+id/et_descuento_vehiculo_act_crear" />
 
         <TextView
             android:id="@+id/tv_valor_final_act_crear_vehiculo"
@@ -450,9 +450,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="28dp"
             android:layout_marginLeft="28dp"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintStart_toEndOf="@+id/textView11"
-            app:layout_constraintTop_toBottomOf="@+id/et_precio_sin_iva_vehiculo_act_crear" />
+            app:layout_constraintTop_toBottomOf="@+id/et_descuento_vehiculo_act_crear" />
 
         <TextView
             android:id="@+id/textView43"
@@ -476,6 +476,29 @@
             android:inputType="textPersonName"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView43" />
+
+        <TextView
+            android:id="@+id/textView64"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Descuento:"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/et_precio_sin_iva_vehiculo_act_crear" />
+
+        <EditText
+            android:id="@+id/et_descuento_vehiculo_act_crear"
+            android:layout_width="190dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:ems="10"
+            android:inputType="numberDecimal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView64" />
     </android.support.constraint.ConstraintLayout>
 
 

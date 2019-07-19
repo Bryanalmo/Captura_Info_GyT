@@ -50,37 +50,48 @@
         </activity>
         <activity
             android:name=".Activities.LoginActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.VehiculosActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.CotizarActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.MenuActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.MaquinasActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.CotizarMaquinaActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.CotizacionesMaquinariaActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.VerCotizacionActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.ActualizarActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.CrearActualizarMaquinaActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.ModificarFiltroActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name="com.nononsenseapps.filepicker.FilePickerActivity"
             android:label="@string/app_name"
@@ -93,30 +104,39 @@
         </activity>
         <activity
             android:name=".Activities.CotizarRepuestosActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.CotizacionesRepuestosActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.CrearActualizarVehiculoActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.ModificarFiltroVehiculosActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.VerCotizacionVehiculosActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.ArrendamientoActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.ArrendarVehiculoActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity
             android:name=".Activities.CotizacionesArrendamientosActivity"
-            android:theme="@style/Others" />
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"/>
         <activity android:name=".Activities.VerCotizacionArrendamientoActivity"
-            android:theme="@style/Others"></activity>
+            android:theme="@style/Others"
+            android:configChanges="screenSize|orientation"></activity>
     </application>
 
 </manifest>

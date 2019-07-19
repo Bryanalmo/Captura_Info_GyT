@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
+import android.primer.bryanalvarez.captura_info_gt.Adapters.Accesorio_Vehiculo_AutoComplete_Adapter;
 import android.primer.bryanalvarez.captura_info_gt.Adapters.Vehiculos_Adapter;
 import android.primer.bryanalvarez.captura_info_gt.Models.Accesorio;
 import android.primer.bryanalvarez.captura_info_gt.Models.Cliente;
@@ -25,13 +27,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -65,7 +70,11 @@ public class VehiculosActivity extends AppCompatActivity {
     private ListView listViewVehiculos;
     private Vehiculos_Adapter adapter_vehiculos;
     private ArrayList<Vehiculo> vehiculos = new ArrayList<>();
+    private ArrayList<Accesorio> accesorios = new ArrayList<>();
     private AlertDialog alertDialog_cargando;
+
+    String idAccesorio="";
+    String enviar_guardar = "";
 
     RequestQueue request;
     StringRequest stringRequest;
@@ -173,9 +182,174 @@ public class VehiculosActivity extends AppCompatActivity {
                 Intent intent2 = new Intent(VehiculosActivity.this,ModificarFiltroVehiculosActivity.class);
                 startActivity(intent2);
                 return true;
+            case R.id.menu_vehiculos_modificar_precios:
+                showDialogModificarPrecios();
+                return true;
             default:return super.onOptionsItemSelected(item);
         }
 
+    }
+
+    private void showDialogModificarPrecios() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Modificar precios");
+
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_modificar_precios_vehiculos, null);
+        builder.setView(viewInflated);
+
+        final EditText et_modificar_precio = (EditText) viewInflated.findViewById(R.id.et_modificar_precio_accesorio);
+        final AutoCompleteTextView actv_nombre = (AutoCompleteTextView) viewInflated.findViewById(R.id.actv_nombre_accesorio);
+
+        accesorios.clear();
+
+        traer_accesorios_WebService(actv_nombre);
+
+        actv_nombre.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    for (int i = 0; i < accesorios.size(); i++) {
+                        if (accesorios.get(i).getReferencia().equals(actv_nombre.getText().toString())){
+                            et_modificar_precio.setText(accesorios.get(i).getValor()+"");
+                            idAccesorio = accesorios.get(i).getId();
+                        }
+                    }
+            }
+        });
+
+        builder.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String precio = et_modificar_precio.getText().toString();
+
+                alertDialog_cargando = new AlertDialog.Builder(VehiculosActivity.this).create();
+                alertDialog_cargando.setMessage("Enviando datos...");
+                alertDialog_cargando.setCancelable(false);
+                alertDialog_cargando.setCanceledOnTouchOutside(false);
+                alertDialog_cargando.show();
+
+                modificar_precios_WebService(precio);
+            }
+        });
+
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void modificar_precios_WebService(final String precio) {
+        String url = "https://golfyturf.com/feria_automovil/AppWebServices/actualizar_precio_accesorio_vehiculo.php";
+        url = url.replace(" ", "%20");
+
+        stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                JSONObject jsonObject = null;
+                alertDialog_cargando.dismiss();
+                try {
+                    jsonObject = new JSONObject(response);
+                    accesorios.clear();
+                    if(jsonObject.getString("Success").equals("true")){
+                        Toast.makeText(VehiculosActivity.this, "Actualización exitosa", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(VehiculosActivity.this, "Error al enviar los datos", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (error instanceof TimeoutError){
+                    Toast.makeText(VehiculosActivity.this, "Creación exitosa", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> parametros = new HashMap<>();
+                parametros.put("Id", idAccesorio);
+                parametros.put("Precio", precio);
+
+                return parametros;
+            }
+        };
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,0,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        request.add(stringRequest);
+    }
+
+    private void traer_accesorios_WebService(final AutoCompleteTextView actv_nombre) {
+        String url = "https://golfyturf.com/feria_automovil/AppWebServices/get_accesorios.php";
+        url = url.replace(" ", "%20");
+
+        stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+
+            @Override
+            public void onResponse(String response) {
+                JSONArray jsonArray = null;
+                Accesorio accesorio= null;
+
+                String Id;
+                String Referencia;
+                int Precio;
+                double IVA;
+                long Precio_IVA;
+                long Aumento_IVA;
+
+
+                try {
+                    jsonArray = new JSONArray(response);
+                    for (int i=0; i<jsonArray.length(); i++ ){
+
+                        Id = jsonArray.getJSONObject(i).getString("Id");
+                        Precio = jsonArray.getJSONObject(i).getInt("Precio");
+                        Referencia = jsonArray.getJSONObject(i).getString("Accesorio");
+                        IVA = jsonArray.getJSONObject(i).getDouble("IVA");
+
+                        Precio = Math.round(Precio);
+                        Aumento_IVA = (long) (Precio*IVA);
+                        Precio_IVA = (long) (Precio + (Aumento_IVA));
+
+                        accesorio = new Accesorio();
+
+                        accesorio.setId(Id);
+                        accesorio.setReferencia(Referencia);
+                        accesorio.setValor(Precio);
+                        accesorio.setAumento_IVA(Aumento_IVA);
+                        accesorio.setPrecio_IVA(Precio_IVA);
+                        accesorio.setCheck(false);
+
+                        accesorios.add(accesorio);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Accesorio_Vehiculo_AutoComplete_Adapter adapter_clientes = new Accesorio_Vehiculo_AutoComplete_Adapter(VehiculosActivity.this,R.layout.autocomplete_item_cliente,R.id.lbl_name,accesorios);
+                actv_nombre.setAdapter(adapter_clientes);
+
+            }
+
+
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                HashMap<String, String> parametros = new HashMap<>();
+                parametros.put("id_vehiculo", "0");
+                return  parametros;
+            }
+        };
+        request.add(stringRequest);
     }
 
     private void showDialogCrearAccesorio() {
@@ -299,6 +473,7 @@ public class VehiculosActivity extends AppCompatActivity {
 
                 String Id;
                 int Precio;
+                int Precio_dolares;
                 String Tipo;
                 String Marca;
                 String Modelo;
@@ -317,7 +492,9 @@ public class VehiculosActivity extends AppCompatActivity {
                 String Distancia_suelo;
                 double IVA;
                 long Precio_IVA;
+                long Precio_sin_descuento;
                 long Aumento_IVA;
+                double Descuento;
 
                 try {
                     jsonArray = new JSONArray(response);
@@ -325,6 +502,7 @@ public class VehiculosActivity extends AppCompatActivity {
 
                         Id = jsonArray.getJSONObject(i).getString("Id");
                         Precio = jsonArray.getJSONObject(i).getInt("Precio");
+                        Precio_dolares = jsonArray.getJSONObject(i).getInt("Precio");
                         Tipo = jsonArray.getJSONObject(i).getString("Tipo");
                         Marca = jsonArray.getJSONObject(i).getString("Marca");
                         Modelo = jsonArray.getJSONObject(i).getString("Nombre_vehiculo");
@@ -345,12 +523,17 @@ public class VehiculosActivity extends AppCompatActivity {
                         Precio = (int) (Precio * Util.monedaActual);
                         Aumento_IVA = (long) (Precio*IVA);
                         Precio_IVA = (long) (Precio + (Aumento_IVA));
+                        Descuento = jsonArray.getJSONObject(i).getDouble("Descuento");
 
                         if (Util.monedaActual != 1){
                             Precio_IVA = redondearPrecio(Precio_IVA);
                             Precio = redondearPrecioSinIVa(Precio_IVA, IVA);
                             Aumento_IVA = recalcularAumentoIVA(Precio, IVA);
                         }
+
+                        Precio_sin_descuento = Precio;
+
+                        Precio_IVA = (long) (Precio_IVA * (1-Descuento));
 
                         vehiculo = new Vehiculo();
 
@@ -376,6 +559,9 @@ public class VehiculosActivity extends AppCompatActivity {
                         vehiculo.setColores(Color);
                         vehiculo.setDistancia_al_suelo(Distancia_suelo);
                         vehiculo.setAgregado(false);
+                        vehiculo.setDescuento(Descuento);
+                        vehiculo.setValor_dolares(Precio_dolares);
+                        vehiculo.setValor_sin_descuento(Precio_sin_descuento);
 
                         vehiculos_WS.add(vehiculo);
                     }
@@ -439,7 +625,6 @@ public class VehiculosActivity extends AppCompatActivity {
     }
 
     private void showAlertDatosCliente(String title, String message) {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         if (title != null) builder.setTitle(title);
@@ -449,14 +634,30 @@ public class VehiculosActivity extends AppCompatActivity {
         builder.setView(viewInflated);
 
         final EditText et_dialog_nombre_cliente = (EditText) viewInflated.findViewById(R.id.et_dialog_nombre_cliente);
-        final EditText et_dialog_nit_cliente = (EditText) viewInflated.findViewById(R.id.et_dialog_nit_cliente);
         final EditText et_dialog_celular_cliente = (EditText) viewInflated.findViewById(R.id.et_dialog_celular_cliente);
         final EditText et_dialog_correo_cliente = (EditText) viewInflated.findViewById(R.id.et_dialog_correo_cliente);
-        final EditText et_dialog_ciudad_cliente = (EditText) viewInflated.findViewById(R.id.et_dialog_ciudad_cliente);
         final EditText et_dialog_ciudad_observaciones = (EditText) viewInflated.findViewById(R.id.et_dialog_ciudad_observaciones);
         final ImageButton ib_dialog_cargar_cliente = (ImageButton) viewInflated.findViewById(R.id.ib_dialog_cargar_cliente);
         final Button bt_dialog_enviar_cotizacion = (Button) viewInflated.findViewById(R.id.bt_dialog_enviar_cotizacion);
         final CheckBox cb_tratamiento_datos= (CheckBox) viewInflated.findViewById(R.id.cb_tratamiento_datos);
+        final TextView tv_interes_cliente = (TextView) viewInflated.findViewById(R.id.tv_interes_cliente);
+        final SeekBar seekBar_interes_cliente = (SeekBar) viewInflated.findViewById(R.id.seekBar_interes_cliente);
+        seekBar_interes_cliente.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                tv_interes_cliente.setText(progress+"");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
         final AlertDialog dialog = builder.create();
         dialog.show();
@@ -465,12 +666,12 @@ public class VehiculosActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String nombre = et_dialog_nombre_cliente.getText().toString();
-                String nit = et_dialog_nit_cliente.getText().toString();
                 String celular = et_dialog_celular_cliente.getText().toString();
                 String correo = et_dialog_correo_cliente.getText().toString().replace(" ","");
-                String ciudad = et_dialog_ciudad_cliente.getText().toString();
                 String observaciones = et_dialog_ciudad_observaciones.getText().toString();
+                String id_vehiculo = Util.getVehiculo().getId();
                 String id_comercial = Util.getId_usuario();
+                String interes = tv_interes_cliente.getText().toString();
                 if(cb_tratamiento_datos.isChecked()){
                     if (correo.isEmpty()){
                         Toast.makeText(VehiculosActivity.this,"Llene el campo Correo",Toast.LENGTH_SHORT).show();
@@ -480,7 +681,7 @@ public class VehiculosActivity extends AppCompatActivity {
                             et_dialog_correo_cliente.setError("Email no válido");
                         }else {
                             dialog.dismiss();
-                            showAlertDetallesCorreo(nombre, nit, celular, correo, ciudad, id_comercial, observaciones);
+                            confirmarEnvio(nombre, celular, correo, id_comercial, observaciones, interes);
                         }
                     }
                 }else{
@@ -493,14 +694,44 @@ public class VehiculosActivity extends AppCompatActivity {
         ib_dialog_cargar_cliente.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showAlertCargarCliente(et_dialog_nombre_cliente, et_dialog_nit_cliente, et_dialog_celular_cliente, et_dialog_correo_cliente, et_dialog_ciudad_cliente);
+                showAlertCargarCliente(et_dialog_nombre_cliente, et_dialog_celular_cliente, et_dialog_correo_cliente, seekBar_interes_cliente);
             }
         });
 
 
+
+
     }
 
-    private void showAlertCargarCliente(final EditText et_dialog_nombre_cliente, final EditText et_dialog_nit_cliente, final EditText et_dialog_celular_cliente, final EditText et_dialog_correo_cliente, final EditText et_dialog_ciudad_cliente) {
+    private void confirmarEnvio(final String nombre,final String celular, final String correo, final String id_comercial, final String observaciones, final String interes){
+        AlertDialog alertDialog = new AlertDialog.Builder(VehiculosActivity.this).create();
+        alertDialog.setMessage("¿Desea solo guardar la cotización o enviarla ahora?");
+        alertDialog.setCancelable(false);
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Enviar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                enviar_guardar = "2";
+                showAlertDetallesCorreo(nombre, celular, correo, id_comercial, observaciones, interes);
+            }
+        });
+        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Guardar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                enviar_guardar = "1";
+                cotizar_WebService(nombre, celular, correo, id_comercial, observaciones, "", "", interes);
+                alertDialog_cargando = new AlertDialog.Builder(VehiculosActivity.this).create();
+                alertDialog_cargando.setMessage("Guardando datos");
+                alertDialog_cargando.setCancelable(false);
+                alertDialog_cargando.setCanceledOnTouchOutside(false);
+                alertDialog_cargando.show();
+            }
+        });
+        alertDialog.show();
+
+    }
+
+    private void showAlertCargarCliente(final EditText et_dialog_nombre_cliente, final EditText et_dialog_celular_cliente, final EditText et_dialog_correo_cliente, final SeekBar seekBar_interes_cliente) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Clientes añadidos");
@@ -518,10 +749,13 @@ public class VehiculosActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 Cliente cliente_selec = (Cliente) spinner_clientes_agregados.getSelectedItem();
                 et_dialog_nombre_cliente.setText(cliente_selec.getNombre());
-                et_dialog_nit_cliente.setText(cliente_selec.getCedula_nit());
                 et_dialog_celular_cliente.setText(cliente_selec.getCelular());
                 et_dialog_correo_cliente.setText(cliente_selec.getCorreo());
-                et_dialog_ciudad_cliente.setText(cliente_selec.getCiudad());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    seekBar_interes_cliente.setProgress(cliente_selec.getInteres(),true);
+                }else{
+                    seekBar_interes_cliente.setProgress(cliente_selec.getInteres());
+                }
             }
         });
 
@@ -584,7 +818,7 @@ public class VehiculosActivity extends AppCompatActivity {
         return pattern.matcher(email).matches();
     }
 
-    private void showAlertDetallesCorreo(final String nombre, final String nit, final String celular, final String correo, final String ciudad, final String id_comercial, final String observaciones) {
+    private void showAlertDetallesCorreo(final String nombre, final String celular, final String correo, final String id_comercial, final String observaciones, final String interes) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -610,7 +844,7 @@ public class VehiculosActivity extends AppCompatActivity {
                 String asunto = et_asunto_correo.getText().toString();
                 String cuerpo = et_cuerpo_correo.getText().toString();
                 //Toast.makeText(CotizarRepuestosActivity.this, formaPago, Toast.LENGTH_SHORT).show();
-                cotizar_WebService(nombre, nit, celular, correo, ciudad, id_comercial, observaciones, asunto,cuerpo);
+                cotizar_WebService(nombre,celular, correo, id_comercial, observaciones, asunto,cuerpo, interes);
                 alertDialog_cargando = new AlertDialog.Builder(VehiculosActivity.this).create();
                 alertDialog_cargando.setMessage("Enviando datos");
                 alertDialog_cargando.setCancelable(false);
@@ -626,13 +860,13 @@ public class VehiculosActivity extends AppCompatActivity {
     private void cargarAsuntoyCuerpoCorreo(EditText et_asunto_correo, EditText et_cuerpo_correo){
 
         String cuerpo = "De acuerdo a su amable solicitud y a las necesidades descritas, tenemos el agrado de someter a su consideración nuestra oferta técnico económica para el suministro de vehículos personales y utilitarios para distancias intermedias marca EZ-GO y CUSHMAN, de procedencia americana (U.S.A) y pertenecientes a la multinacional Textron Co."
-                + "\n" + "\n" +  "En Golf y Turf SAS, distribuidores autorizados para Colombia de estas marcas, agradecemos la oportunidad de presentarle esta oferta, esperando que se atractiva para ud y que sea una solución integral, de igual manera estaremos atentos a resolver cualquier duda que pueda surgir, nos puede contactar a través de los medios descritos a continuación.";
+                + "\n" + "\n" + "En Golf y Turf SAS, distribuidores autorizados para Colombia de estas marcas, agradecemos la oportunidad de presentarle esta oferta, esperando que se atractiva para usted, de igual manera estaremos atentos a resolver cualquier duda que pueda surgir, nos puede contactar a través de los medios descritos a continuación.";
         et_cuerpo_correo.setText(cuerpo);
-        String asunto = "Propuesta vehículo EZ-GO";
+        String asunto = "Propuesta vehiculo EZ-GO/CUSHMAN";
         et_asunto_correo.setText(asunto);
     }
 
-    private void cotizar_WebService(final String nombre, final String nit, final String celular, final String correo, final String ciudad, final String id_comercial, final String observaciones, final String asunto, final String cuerpo) {
+    private void cotizar_WebService(final String nombre,final String celular, final String correo, final String id_comercial, final String observaciones, final String asunto, final String cuerpo, final String interes) {
         String url = "https://golfyturf.com/feria_automovil/AppWebServices/crear_cotizacion.php";
         url = url.replace(" ", "%20");
 
@@ -668,7 +902,7 @@ public class VehiculosActivity extends AppCompatActivity {
             public void onErrorResponse(VolleyError error) {
                 if (error instanceof TimeoutError){
                     Util.cotizaciones_vehiculos.clear();
-                    Toast.makeText(VehiculosActivity.this, "Creación exitosa, un email será enviado en breve.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(VehiculosActivity.this, "Creación exitosa", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(VehiculosActivity.this,MainActivity.class);
                     startActivity(intent);
                 }else{
@@ -679,13 +913,14 @@ public class VehiculosActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 HashMap<String, String> parametros = new HashMap<>();
+                parametros.put("Enviar_guardar", enviar_guardar);
+                parametros.put("Numero_cot", " ");
                 parametros.put("Nombre_cliente", nombre);
-                parametros.put("Nit_cliente", nit);
                 parametros.put("Celular_cliente", celular);
                 parametros.put("Correo_cliente", correo);
-                parametros.put("Ciudad_cliente", ciudad);
                 parametros.put("Id_comercial", id_comercial);
                 parametros.put("Observaciones", observaciones);
+                parametros.put("Interes", interes);
                 parametros.put("Asunto", asunto );
                 parametros.put("Cuerpo", cuerpo );
                 parametros.put("Numero_sub_cotizaciones", Util.cotizaciones_vehiculos.size()+"");
@@ -696,6 +931,7 @@ public class VehiculosActivity extends AppCompatActivity {
                     parametros.put("Valor_sin_IVA_Vehiculo"+j, Util.cotizaciones_vehiculos.get(j).getVehiculo().getValor()+"");
                     parametros.put("Valor_IVA_Vehiculo"+j, Util.cotizaciones_vehiculos.get(j).getVehiculo().getAumento_IVA()+"");
                     parametros.put("Valor_Vehiculo"+j, Util.cotizaciones_vehiculos.get(j).getVehiculo().getValor_IVA()+"");
+                    parametros.put("Valor_Vehiculo_sin_descuento"+j, Util.cotizaciones_vehiculos.get(j).getVehiculo().getValor_sin_descuento()+"");
                     parametros.put("Valor_sin_IVA"+j, Util.cotizaciones_vehiculos.get(j).getValor_sin_iva()+"");
                     parametros.put("Valor_IVA"+j, Util.cotizaciones_vehiculos.get(j).getValor_iva()+"");
                     parametros.put("Valor"+j, Util.cotizaciones_vehiculos.get(j).getValor()+"");

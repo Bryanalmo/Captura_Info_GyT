@@ -63,6 +63,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.Math.round;
+
 public class CrearActualizarVehiculoActivity extends AppCompatActivity {
 
     private ImageView iv_imagen_vehiculo_act_crear;
@@ -81,6 +83,7 @@ public class CrearActualizarVehiculoActivity extends AppCompatActivity {
     private EditText et_incluye_vehiculo_act_crear;
     private EditText et_distancia_suelo_vehiculo_act_crear2;
     private EditText et_colores_vehiculo_act_crear;
+    private EditText et_descuento_vehiculo_act_crear;
     private Spinner spinner_marca_vehiculo;
     private Spinner spinner_tipo_vehiculo;
     private TextView tv_valor_final_act_crear_vehiculo;
@@ -220,6 +223,61 @@ public class CrearActualizarVehiculoActivity extends AppCompatActivity {
                     }
 
                 }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        et_descuento_vehiculo_act_crear.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() != 0 && Double.parseDouble(s.toString()) != 0) {
+                    long precio_nuevo_sin_iva =0;
+                    long precio_nuevo_descuento = 0;
+                    double iva_maquina = 0;
+                    if(et_precio_sin_iva_vehiculo_act_crear.getText().toString().isEmpty()){
+                        precio_nuevo_sin_iva = 0;
+                    }else{
+                        precio_nuevo_sin_iva = Integer.parseInt(et_precio_sin_iva_vehiculo_act_crear.getText().toString());
+                    }
+                    if(et_iva_vehiculo_act_crear.getText().toString().isEmpty()){
+                        iva_maquina = 0;
+                    }else{
+                        iva_maquina = Double.parseDouble(et_iva_vehiculo_act_crear.getText().toString());
+                    }
+                    long precio_nuevo_iva = 0;
+                    double descuento_maquina = Double.parseDouble(s.toString()) ;
+                    precio_nuevo_iva = (long) (precio_nuevo_sin_iva + (precio_nuevo_sin_iva*iva_maquina));
+                    precio_nuevo_descuento = (long) (precio_nuevo_iva * (1-descuento_maquina));
+                    String format_valor_nuevo= NumberFormat.getInstance().format(precio_nuevo_descuento);
+                    tv_valor_final_act_crear_vehiculo.setText("$ "+format_valor_nuevo);
+                }else{
+                    long precio_nuevo_sin_iva =0;
+                    double iva_maquina = 0;
+                    if(et_precio_sin_iva_vehiculo_act_crear.getText().toString().isEmpty()){
+                        precio_nuevo_sin_iva = 0;
+                    }else{
+                        precio_nuevo_sin_iva = Integer.parseInt(et_precio_sin_iva_vehiculo_act_crear.getText().toString());
+                    }
+                    if(et_iva_vehiculo_act_crear.getText().toString().isEmpty()){
+                        iva_maquina = 0;
+                    }else{
+                        iva_maquina = Double.parseDouble(et_iva_vehiculo_act_crear.getText().toString());
+                    }
+                    long precio_nuevo_iva = (long) (precio_nuevo_sin_iva + (precio_nuevo_sin_iva*iva_maquina));
+                    String format_valor_nuevo= NumberFormat.getInstance().format(precio_nuevo_iva);
+                    tv_valor_final_act_crear_vehiculo.setText("$ "+format_valor_nuevo);
+
+                }
+
             }
 
             @Override
@@ -394,7 +452,7 @@ public class CrearActualizarVehiculoActivity extends AppCompatActivity {
         if (editar_crear.equals("editar")){
             Picasso.with(this).load(vehiculo.getImagen()).into(iv_imagen_vehiculo_act_crear);
             et_nombre_vehiculo_act_crear.setText(vehiculo.getModelo());
-            et_precio_sin_iva_vehiculo_act_crear.setText(vehiculo.getValor()+"");
+            et_precio_sin_iva_vehiculo_act_crear.setText(vehiculo.getValor_dolares()+"");
             et_iva_vehiculo_act_crear.setText(vehiculo.getIVA()+"");
             et_motor_vehiculo_act_crear.setText(vehiculo.getMotor());
             et_chasis_vehiculo_act_crear.setText(vehiculo.getChasis());
@@ -408,10 +466,13 @@ public class CrearActualizarVehiculoActivity extends AppCompatActivity {
             et_incluye_vehiculo_act_crear.setText(vehiculo.getDatos_incluye());
             et_colores_vehiculo_act_crear.setText(vehiculo.getColores());
             et_distancia_suelo_vehiculo_act_crear2.setText(vehiculo.getDistancia_al_suelo());
-            String format_valor= NumberFormat.getInstance().format(vehiculo.getValor_IVA());
+            long precio = (long) (vehiculo.getValor_dolares() + (vehiculo.getValor_dolares()*vehiculo.getIVA()));
+            long precio_descuento = (long) (precio * (1-vehiculo.getDescuento()));
+            String format_valor= NumberFormat.getInstance().format(precio_descuento);
             tv_valor_final_act_crear_vehiculo.setText("$ "+ format_valor);
             tv_titulo_act_crear_vehiculo.setText("Editar Vehículo");
             btn_act_crear_vehiculo.setText("Actualizar");
+            et_descuento_vehiculo_act_crear.setText(vehiculo.getDescuento()+"");
         }
     }
 
@@ -731,6 +792,7 @@ public class CrearActualizarVehiculoActivity extends AppCompatActivity {
         itemDecoration_componentes = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL);
         recycler_view_accesorios_vehiculo_act_crear.setLayoutManager(mLayoutManager_componentes);
         recycler_view_accesorios_vehiculo_act_crear.addItemDecoration(itemDecoration_componentes);
+        et_descuento_vehiculo_act_crear = (EditText) findViewById(R.id.et_descuento_vehiculo_act_crear);
     }
 
     private void actualizar_vehculo_WebService(){
@@ -780,6 +842,7 @@ public class CrearActualizarVehiculoActivity extends AppCompatActivity {
                 String modelo = et_nombre_vehiculo_act_crear.getText().toString();
                 String valor = et_precio_sin_iva_vehiculo_act_crear.getText().toString();
                 String IVA = et_iva_vehiculo_act_crear.getText().toString();
+                String Descuento = et_descuento_vehiculo_act_crear.getText().toString();
                 String motor = et_motor_vehiculo_act_crear.getText().toString();
                 String chasis = et_chasis_vehiculo_act_crear.getText().toString();
                 String frenos = et_frenos_vehiculo_act_crear.getText().toString();
@@ -818,6 +881,7 @@ public class CrearActualizarVehiculoActivity extends AppCompatActivity {
                 parametros.put("peso",peso);
                 parametros.put("valor",valor);
                 parametros.put("IVA",IVA);
+                parametros.put("descuento",Descuento);
                 parametros.put("imagen", imagen_maquina);
                 parametros.put("datos_incluye",datos_incluye);
                 parametros.put("colores",colores);

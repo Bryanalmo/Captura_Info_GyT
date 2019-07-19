@@ -98,4 +98,14 @@
             app:layout_constraintTop_toBottomOf="@+id/textView55" />
 
     </RadioGroup>
+
+    <TextView
+        android:id="@+id/textView68"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:text="USD"
+        app:layout_constraintBaseline_toBaselineOf="@+id/et_modificar_precio"
+        app:layout_constraintStart_toEndOf="@+id/et_modificar_precio" />
 </android.support.constraint.ConstraintLayout>

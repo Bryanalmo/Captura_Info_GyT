@@ -9,6 +9,7 @@ public class Maquina {
     private String Referencia;
     private String Modelo_maquina;
     private int Precio;
+    private int Precio_dolares;
     private double IVA;
     private long Precio_IVA;
     private long Aumento_IVA;
@@ -22,6 +23,7 @@ public class Maquina {
     private boolean agregado;
     private String Descripcion;
     private boolean best_product;
+    private double descuento;
 
     public String getId() {
         return Id;
@@ -157,5 +159,21 @@ public class Maquina {
 
     public void setBest_product(boolean best_product) {
         this.best_product = best_product;
+    }
+
+    public double getDescuento() {
+        return descuento;
+    }
+
+    public void setDescuento(double descuento) {
+        this.descuento = descuento;
+    }
+
+    public int getPrecio_dolares() {
+        return Precio_dolares;
+    }
+
+    public void setPrecio_dolares(int precio_dolares) {
+        Precio_dolares = precio_dolares;
     }
 }

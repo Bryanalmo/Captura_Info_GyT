@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 String Comercial;
                 long Valor_general;
                 String Observaciones;
+                String Id_estado_envio;
 
                 String Id_cliente;
                 String Nombre_cliente;
@@ -130,6 +131,7 @@ public class MainActivity extends AppCompatActivity {
                 String Celular_cliente;
                 String Correo_cliente;
                 String Ciudad_cliente;
+                int Interes_cliente;
 
                 String Id_sub_cotizacion;
                 int Valor_sin_iva_sub_cotizacion;
@@ -154,6 +156,8 @@ public class MainActivity extends AppCompatActivity {
                 double IVA_vehiculo;
                 long Precio_vehiculo_IVA;
                 long Aumento_vehiculo_IVA;
+                double Descuento;
+                long Precio_sin_descuento;
 
                 String Id_accesorio;
                 int Precio_accesorio;
@@ -172,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
                         Comercial = jsonArray.getJSONObject(i).getString("Nombres");
                         Valor_general = jsonArray.getJSONObject(i).getLong("Valor");
                         Observaciones = jsonArray.getJSONObject(i).getString("Observaciones");
+                        Id_estado_envio = jsonArray.getJSONObject(i).getString("Id_estado_envio");
 
                         Id_cliente = jsonArray.getJSONObject(i).getString("Id_cliente");
                         Nombre_cliente = jsonArray.getJSONObject(i).getString("Nombre");
@@ -179,13 +184,22 @@ public class MainActivity extends AppCompatActivity {
                         Celular_cliente = jsonArray.getJSONObject(i).getString("Celular");
                         Correo_cliente = jsonArray.getJSONObject(i).getString("Correo");
                         Ciudad_cliente = jsonArray.getJSONObject(i).getString("Ciudad");
+                        Interes_cliente = jsonArray.getJSONObject(i).getInt("Nivel_interes");
 
                         Cliente cliente = new Cliente(Id_cliente,Nombre_cliente,Cedula_nit_cliente,Celular_cliente,Correo_cliente,Ciudad_cliente);
+                        cliente.setInteres(Interes_cliente);
 
                         Cotizacion subCotizacion = null;
                         Vehiculo vehiculo = null;
                         JSONArray jsonArraySubcotizaciones= null;
                         ArrayList<Cotizacion> subcotizaciones_WS = new ArrayList<>();
+
+                        double moneda =0;
+                        if (Valor_general > 1000000){
+                            moneda = Util.TRM;
+                        }else{
+                            moneda = 1;
+                        }
 
                         jsonArraySubcotizaciones = jsonArray.getJSONObject(i).getJSONArray("Sub_cotizaciones");
                         for (int j=0; j<jsonArraySubcotizaciones.length(); j++){
@@ -200,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
 
                             Id_vehiculo = jsonArraySubcotizaciones.getJSONObject(j).getString("Id_vehiculo");
                             Precio_vehiculo = jsonArraySubcotizaciones.getJSONObject(j).getInt("Precio");
+                            Precio_vehiculo = (int) (Precio_vehiculo * moneda);
                             Tipo_vehiculo = jsonArraySubcotizaciones.getJSONObject(j).getString("Tipo");
                             Marca_vehiculo = jsonArraySubcotizaciones.getJSONObject(j).getString("Marca");
                             Modelo_vehiculo = jsonArraySubcotizaciones.getJSONObject(j).getString("Nombre_vehiculo");
@@ -214,11 +229,23 @@ public class MainActivity extends AppCompatActivity {
                             Peso_vehiculo = jsonArraySubcotizaciones.getJSONObject(j).getString("Peso");
                             Imagen_vehiculo_vehiculo = jsonArraySubcotizaciones.getJSONObject(j).getString("Imagen_vehiculo");
                             IVA_vehiculo = jsonArraySubcotizaciones.getJSONObject(j).getDouble("IVA");
+                            Descuento = jsonArraySubcotizaciones.getJSONObject(j).getDouble("Descuento");
 
                             Aumento_vehiculo_IVA = (long) (Precio_vehiculo*IVA_vehiculo);
                             Precio_vehiculo_IVA = (long) (Precio_vehiculo + (Aumento_vehiculo_IVA));
                             valor_sin_iva_calculado = Precio_vehiculo;
                             valor_iva_calculado = (int) Aumento_vehiculo_IVA;
+
+                            if (Valor_general > 1000000){
+                                Precio_vehiculo_IVA = redondearPrecio(Precio_vehiculo_IVA);
+                                Precio_vehiculo = redondearPrecioSinIVa(Precio_vehiculo_IVA, IVA_vehiculo);
+                                Aumento_vehiculo_IVA = recalcularAumentoIVA(Precio_vehiculo, IVA_vehiculo);
+                            }
+
+                            Precio_sin_descuento = Precio_vehiculo;
+
+                            Precio_vehiculo_IVA = (long) (Precio_vehiculo_IVA * (1-Descuento));
+
                             vehiculo = new Vehiculo();
 
                             vehiculo.setId(Id_vehiculo);
@@ -238,6 +265,7 @@ public class MainActivity extends AppCompatActivity {
                             vehiculo.setAumento_IVA(Aumento_vehiculo_IVA);
                             vehiculo.setValor_IVA(Precio_vehiculo_IVA);
                             vehiculo.setImagen(Imagen_vehiculo_vehiculo);
+                            vehiculo.setValor_sin_descuento(Precio_sin_descuento);
 
                             Accesorio accesorio = null;
                             JSONArray jsonArrayAccesoriosSelec = null;
@@ -247,6 +275,7 @@ public class MainActivity extends AppCompatActivity {
                             for (int k=0; k<jsonArrayAccesoriosSelec.length(); k++){
                                 Id_accesorio = jsonArrayAccesoriosSelec.getJSONObject(k).getString("Id_accesorio");
                                 Precio_accesorio = jsonArrayAccesoriosSelec.getJSONObject(k).getInt("Precio");
+                                Precio_accesorio = (int) (Precio_accesorio * moneda);
                                 Referencia = jsonArrayAccesoriosSelec.getJSONObject(k).getString("Accesorio");
                                 IVA_accesorio = jsonArrayAccesoriosSelec.getJSONObject(k).getDouble("IVA");
 
@@ -272,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
 
                         }
 
-                        cotizacion = new Cotizacion_General_Vehiculo(Id_cotizaion_general,Numero,Id_comercial,Comercial,Valor_general,cliente,subcotizaciones_WS,Observaciones);
+                        cotizacion = new Cotizacion_General_Vehiculo(Id_cotizaion_general,Numero,Id_comercial,Comercial,Valor_general,cliente,subcotizaciones_WS,Observaciones, Id_estado_envio);
                         cotizaciones_WS.add(cotizacion);
                     }
                     adapter = new Cotizaciones_Adapter(MainActivity.this, cotizaciones_WS, R.layout.list_view_item_cotizacion);
@@ -282,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    //Toast.makeText(MainActivity.this, "e: "+ e.getMessage().toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "e: "+ e.getMessage().toString(), Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -300,6 +329,40 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         request.add(stringRequest);
+    }
+
+    private long recalcularAumentoIVA(int precio, double iva) {
+        return (long) (precio * iva);
+    }
+
+    private int redondearPrecioSinIVa(long precio_iva, double iva) {
+        return (int) (precio_iva / (1+iva));
+    }
+
+    private long redondearPrecio(long precio) {
+
+        double precio_objetivo = 0;
+        double precio_round = precio/100000;
+        for (int i = 1000000; i < 100000000 ; i+=1000000) {
+            if(precio>=i && precio<(i+1000000)){
+                int factor = 1000;
+                while (precio_round != precio_objetivo){
+
+                    long precio_div = precio/(factor);
+                    double precio_div_round = Math.ceil(precio_div);
+                    precio = (long) (precio_div_round*(factor));
+
+                    precio_objetivo = i/100000;
+                    precio_round = precio/100000;
+
+                    factor = factor*10;
+
+                }
+                break;
+            }
+        }
+
+        return precio - 100000;
     }
 
     @Override

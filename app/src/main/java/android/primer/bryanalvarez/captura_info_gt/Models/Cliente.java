@@ -13,6 +13,7 @@ public class Cliente {
     private String correo;
     private String ciudad;
     private int position;
+    private int interes;
 
     public Cliente(String id, String nombre){
         this.id = id;
@@ -82,6 +83,14 @@ public class Cliente {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public int getInteres() {
+        return interes;
+    }
+
+    public void setInteres(int interes) {
+        this.interes = interes;
     }
 
     @Override

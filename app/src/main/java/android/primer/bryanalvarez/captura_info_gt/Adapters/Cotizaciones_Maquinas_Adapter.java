@@ -63,6 +63,7 @@ public class Cotizaciones_Maquinas_Adapter extends BaseAdapter {
             vh.tv_list_view_comercial_maquina = (TextView) convertView.findViewById(R.id.tv_list_view_comercial_maquina);
             vh.tv_list_view_valor_cotizacion = (TextView) convertView.findViewById(R.id.tv_list_view_valor_cotizacion);
             vh.iv_list_view_foto_maquina = (ImageView) convertView.findViewById(R.id.iv_list_view_foto_maquina);
+            vh.iv_enviar_cotizacion = (ImageView) convertView.findViewById(R.id.iv_enviar_cotizacion);
 
             convertView.setTag(vh);
         }else{
@@ -70,6 +71,11 @@ public class Cotizaciones_Maquinas_Adapter extends BaseAdapter {
         }
 
         Cotizacion_Maquina cotizacion = lista.get(position);
+        if (cotizacion.getId_estado_envio().equals("1")){
+            vh.iv_enviar_cotizacion.setVisibility(View.VISIBLE);
+        }else{
+            vh.iv_enviar_cotizacion.setVisibility(View.GONE);
+        }
         vh.tv_list_view_cliente_maquina.setText(cotizacion.getCliente());
         ArrayList<SubCotizacion> subCotizaciones = cotizacion.getSubCotizaciones();
         String maquinas = "";
@@ -97,6 +103,7 @@ public class Cotizaciones_Maquinas_Adapter extends BaseAdapter {
         TextView tv_list_view_comercial_maquina;
         TextView tv_list_view_valor_cotizacion;
         ImageView iv_list_view_foto_maquina;
+        ImageView iv_enviar_cotizacion;
 
     }
 }

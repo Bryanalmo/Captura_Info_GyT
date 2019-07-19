@@ -12,8 +12,9 @@ public class Cotizacion_General_Vehiculo {
     private Cliente Cliente;
     private ArrayList<Cotizacion> subCotizaciones;
     private String Observaciones;
+    private String Id_estado_envio;
 
-    public Cotizacion_General_Vehiculo(String id, String numero, String id_comercial, String comercial, long valor, Cliente cliente, ArrayList<Cotizacion> subCotizaciones, String observaciones) {
+    public Cotizacion_General_Vehiculo(String id, String numero, String id_comercial, String comercial, long valor, Cliente cliente, ArrayList<Cotizacion> subCotizaciones, String observaciones, String id_estado_envio) {
         Id = id;
         Numero = numero;
         Id_comercial = id_comercial;
@@ -22,6 +23,7 @@ public class Cotizacion_General_Vehiculo {
         Cliente = cliente;
         this.subCotizaciones = subCotizaciones;
         Observaciones = observaciones;
+        Id_estado_envio = id_estado_envio;
     }
 
     public String getId() {
@@ -86,5 +88,13 @@ public class Cotizacion_General_Vehiculo {
 
     public void setObservaciones(String observaciones) {
         Observaciones = observaciones;
+    }
+
+    public String getId_estado_envio() {
+        return Id_estado_envio;
+    }
+
+    public void setId_estado_envio(String id_estado_envio) {
+        Id_estado_envio = id_estado_envio;
     }
 }

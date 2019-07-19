@@ -16,10 +16,11 @@ public class Cotizacion_Maquina {
     private String Contacto;
     private String Id_comercial;
     private String Comercial;
+    private String Id_estado_envio;
     private long Valor;
     private ArrayList<SubCotizacion> subCotizaciones;
 
-    public Cotizacion_Maquina(String id, String numero, String id_cliente, String cliente, String id_contacto, String contacto, String id_comercial, String comercial, long valor, ArrayList<SubCotizacion> subCotizaciones) {
+    public Cotizacion_Maquina(String id, String numero, String id_cliente, String cliente, String id_contacto, String contacto, String id_comercial, String comercial,  String id_estado_envio,long valor, ArrayList<SubCotizacion> subCotizaciones) {
         Id = id;
         Numero = numero;
         Id_cliente = id_cliente;
@@ -29,6 +30,7 @@ public class Cotizacion_Maquina {
         Id_comercial = id_comercial;
         Comercial = comercial;
         Valor = valor;
+        Id_estado_envio = id_estado_envio;
         this.subCotizaciones = subCotizaciones;
     }
 
@@ -110,6 +112,14 @@ public class Cotizacion_Maquina {
 
     public void setId_comercial(String id_comercial) {
         Id_comercial = id_comercial;
+    }
+
+    public String getId_estado_envio() {
+        return Id_estado_envio;
+    }
+
+    public void setId_estado_envio(String id_estado_envio) {
+        Id_estado_envio = id_estado_envio;
     }
 
     public ArrayList<SubCotizacion> getSubCotizaciones() {

@@ -115,6 +115,7 @@ public class CotizacionesMaquinariaActivity extends AppCompatActivity {
                 String Nombre_completo;
                 String Nombre_contacto;
                 String Nombre_comercial;
+                String Id_estado_envio;
 
                 String Id_sub_cotizacion;
                 String Id_modelo_maquina;
@@ -143,6 +144,7 @@ public class CotizacionesMaquinariaActivity extends AppCompatActivity {
                         Id_cotizacion = jsonArray.getJSONObject(i).getString("Id");
                         Numero = jsonArray.getJSONObject(i).getString("Numero");
                         Fecha = jsonArray.getJSONObject(i).getString("Fecha");
+                        Id_estado_envio = jsonArray.getJSONObject(i).getString("Id_estado_envio");
                         Id_cliente = jsonArray.getJSONObject(i).getString("Id_cliente");
                         Id_contacto = jsonArray.getJSONObject(i).getString("Id_contacto");
                         Id_comercial = jsonArray.getJSONObject(i).getString("Id_comercial");
@@ -154,6 +156,13 @@ public class CotizacionesMaquinariaActivity extends AppCompatActivity {
                         SubCotizacion subCotizacion = null;
                         JSONArray jsonArraySubcotizaciones= null;
                         ArrayList<SubCotizacion> subcotizaciones_WS = new ArrayList<>();
+
+                        double moneda =0;
+                        if (Valor > 1000000){
+                            moneda = Util.TRM;
+                        }else{
+                            moneda = 1;
+                        }
 
                         jsonArraySubcotizaciones = jsonArray.getJSONObject(i).getJSONArray("Sub_cotizaciones");
                         for (int j=0; j<jsonArraySubcotizaciones.length(); j++){
@@ -169,12 +178,14 @@ public class CotizacionesMaquinariaActivity extends AppCompatActivity {
                             JSONArray jsonArrayComponentes= null;
                             ArrayList<Componente> componentes_WS = new ArrayList<>();
                             jsonArrayComponentes = jsonArraySubcotizaciones.getJSONObject(j).getJSONArray("Componentes");
+
                             for (int k = 0; k < jsonArrayComponentes.length() ; k++) {
 
                                 Id_componente = jsonArrayComponentes.getJSONObject(k).getString("Id_componente");
                                 Descuento = jsonArrayComponentes.getJSONObject(k).getLong("Descuento");
                                 Nombre = jsonArrayComponentes.getJSONObject(k).getString("Nombre");
                                 Precio = jsonArrayComponentes.getJSONObject(k).getLong("Precio");
+                                Precio = (long) (Precio * moneda);
                                 IVA = jsonArrayComponentes.getJSONObject(k).getDouble("IVA");
                                 Cantidad = jsonArrayComponentes.getJSONObject(k).getInt("Cantidad");
                                 Valor_IVA = (long) (Precio*IVA);
@@ -190,7 +201,7 @@ public class CotizacionesMaquinariaActivity extends AppCompatActivity {
                             subCotizacion = new SubCotizacion(Id_sub_cotizacion,Id_modelo_maquina,Modelo_maquina,Valor_sub_cotizacion,Valor_IVA_sub_cotizacion,Valor_total_sub_cotizacion,componentes_WS,Imagen_equipo);
                             subcotizaciones_WS.add(subCotizacion);
                         }
-                        cotizacion = new Cotizacion_Maquina(Id_cotizacion,Numero,Id_cliente,Nombre_completo,Id_contacto,Nombre_contacto,Id_comercial,Nombre_comercial,Valor,subcotizaciones_WS);
+                        cotizacion = new Cotizacion_Maquina(Id_cotizacion,Numero,Id_cliente,Nombre_completo,Id_contacto,Nombre_contacto,Id_comercial,Nombre_comercial, Id_estado_envio, Valor,subcotizaciones_WS);
                         cotizaciones_WS.add(cotizacion);
                     }
                     adapter = new Cotizaciones_Maquinas_Adapter(CotizacionesMaquinariaActivity.this, cotizaciones_WS, R.layout.list_view_item_cotizacion_maquinaria);

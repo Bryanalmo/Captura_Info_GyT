@@ -64,6 +64,7 @@ public class Cotizaciones_Adapter extends BaseAdapter {
             vh.tv_list_view_comercial = (TextView) convertView.findViewById(R.id.tv_list_view_comercial);
             vh.tv_list_view_valor = (TextView) convertView.findViewById(R.id.tv_list_view_valor);
             vh.iv_list_view_foto_vehiculo = (ImageView) convertView.findViewById(R.id.iv_list_view_foto_vehiculo);
+            vh.iv_enviar_cotizacion = (ImageView) convertView.findViewById(R.id.iv_enviar_cotizacion);
 
             convertView.setTag(vh);
         }else{
@@ -71,6 +72,11 @@ public class Cotizaciones_Adapter extends BaseAdapter {
         }
 
         Cotizacion_General_Vehiculo cotizacion = lista.get(position);
+        if (cotizacion.getId_estado_envio().equals("1")){
+            vh.iv_enviar_cotizacion.setVisibility(View.VISIBLE);
+        }else{
+            vh.iv_enviar_cotizacion.setVisibility(View.GONE);
+        }
         vh.tv_list_view_cliente.setText(cotizacion.getCliente().getNombre());
         ArrayList<Cotizacion> subCotizaciones = cotizacion.getSubCotizaciones();
         vh.tv_list_view_modelo.setText(subCotizaciones.get(0).getVehiculo().getModelo());
@@ -91,6 +97,7 @@ public class Cotizaciones_Adapter extends BaseAdapter {
         TextView tv_list_view_comercial;
         TextView tv_list_view_valor;
         ImageView iv_list_view_foto_vehiculo;
+        ImageView iv_enviar_cotizacion;
 
     }
 

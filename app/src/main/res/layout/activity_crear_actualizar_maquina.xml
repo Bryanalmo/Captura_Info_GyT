@@ -109,10 +109,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="16dp"
         android:text="Valor final:"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_precio_sin_iva_vehiculo_act_crear" />
+        app:layout_constraintTop_toBottomOf="@+id/et_descuento_maquina_act_crear" />
 
     <TextView
         android:id="@+id/et_valor_final_act_crear"
@@ -120,9 +120,9 @@
         android:layout_height="15dp"
         android:layout_marginStart="28dp"
         android:layout_marginLeft="28dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintStart_toEndOf="@+id/textView11"
-        app:layout_constraintTop_toBottomOf="@+id/et_precio_sin_iva_vehiculo_act_crear" />
+        app:layout_constraintTop_toBottomOf="@+id/et_descuento_maquina_act_crear" />
 
     <TextView
         android:id="@+id/textView13"
@@ -251,6 +251,29 @@
         android:text="Descripción:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinner_funcion_maquina" />
+
+    <TextView
+        android:id="@+id/textView65"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Descuento:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_precio_sin_iva_vehiculo_act_crear" />
+
+    <EditText
+        android:id="@+id/et_descuento_maquina_act_crear"
+        android:layout_width="198dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="numberDecimal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView65" />
 
 </android.support.constraint.ConstraintLayout>
 </ScrollView>

@@ -20,6 +20,8 @@ public class Vehiculo {
     private String largo_vehiculo;
     private String peso;
     private long valor;
+    private long valor_dolares;
+    private long valor_sin_descuento;
     private long valor_IVA;
     private long aumento_IVA;
     private String imagen;
@@ -28,6 +30,7 @@ public class Vehiculo {
     private String colores;
     private String distancia_al_suelo;
     private boolean agregado;
+    private double descuento;
 
     public String getId() {
         return Id;
@@ -203,5 +206,29 @@ public class Vehiculo {
 
     public void setColores(String colores) {
         this.colores = colores;
+    }
+
+    public double getDescuento() {
+        return descuento;
+    }
+
+    public void setDescuento(double descuento) {
+        this.descuento = descuento;
+    }
+
+    public long getValor_dolares() {
+        return valor_dolares;
+    }
+
+    public void setValor_dolares(long valor_dolares) {
+        this.valor_dolares = valor_dolares;
+    }
+
+    public long getValor_sin_descuento() {
+        return valor_sin_descuento;
+    }
+
+    public void setValor_sin_descuento(long valor_sin_descuento) {
+        this.valor_sin_descuento = valor_sin_descuento;
     }
 }

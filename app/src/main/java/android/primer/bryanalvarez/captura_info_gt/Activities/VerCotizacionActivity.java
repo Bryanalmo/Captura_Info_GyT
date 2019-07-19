@@ -1,5 +1,6 @@
 package android.primer.bryanalvarez.captura_info_gt.Activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.primer.bryanalvarez.captura_info_gt.Adapters.Maquinas_Cotizadas_Adapter;
 import android.primer.bryanalvarez.captura_info_gt.Models.Cliente;
@@ -16,8 +17,11 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,6 +63,7 @@ public class VerCotizacionActivity extends AppCompatActivity {
     String idCliente;
     String idContacto;
     long precio_descuento=0;
+    String enviar_guardar="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,15 +98,63 @@ public class VerCotizacionActivity extends AppCompatActivity {
         bt_guardar_enviar_cotizacion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (cotizacion_maquina.getId_estado_envio().equals("1")){
+                    enviar_guardar = "2";
+                    showAlertDetallesCorreo();
+                }else{
+                    confirmarEnvio();
+                }
+
+            }
+        });
+
+    }
+
+    private void showAlertDetallesCorreo() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Detalles de correo electronico");
+
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_detalles_correo, null);
+        builder.setView(viewInflated);
+
+        final RadioGroup radioGroup  = (RadioGroup) viewInflated.findViewById(R.id.radioGroup);
+        final TextView textView  = (TextView) viewInflated.findViewById(R.id.textView59);
+        final EditText et_asunto_correo = (EditText) viewInflated.findViewById(R.id.et_asunto_correo);
+        final EditText et_cuerpo_correo = (EditText) viewInflated.findViewById(R.id.et_cuerpo_correo);
+
+        radioGroup.setVisibility(View.GONE);
+        textView.setVisibility(View.GONE);
+
+        cargarAsuntoyCuerpoCorreo(et_asunto_correo,et_cuerpo_correo);
+
+        builder.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String asunto = et_asunto_correo.getText().toString();
+                String cuerpo = et_cuerpo_correo.getText().toString();
+                //Toast.makeText(CotizarRepuestosActivity.this, formaPago, Toast.LENGTH_SHORT).show();
+                crear_cotizacion_WebService(asunto,cuerpo);
                 alertDialog_cargando = new AlertDialog.Builder(VerCotizacionActivity.this).create();
                 alertDialog_cargando.setMessage("Enviando datos");
                 alertDialog_cargando.setCancelable(false);
                 alertDialog_cargando.setCanceledOnTouchOutside(false);
                 alertDialog_cargando.show();
-                crear_cotizacion_WebService();
             }
         });
 
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void cargarAsuntoyCuerpoCorreo(EditText et_asunto_correo, EditText et_cuerpo_correo){
+
+        String cuerpo = "En Golf & Turf SAS, distribuidores autorizados para Colombia de Jacobsen, E-Z-GO, Ventrac, entre otras reconocidas marcas, agradecemos la oportunidad de presentarle esta oferta, esperando que se atractiva para usted y que provea una solución integral a sus necesidades. Estaremos atentos a resolver cualquier inquietud que pueda surgir de la misma. A continuación presentaremos los medios a través de los cuales puede comunicarse con nosotros: ";
+        et_cuerpo_correo.setText(cuerpo);
+        String asunto = "Propuesta Maquinaria G&T";
+        et_asunto_correo.setText(asunto);
     }
 
     private void sumarPrecios() {
@@ -135,8 +188,36 @@ public class VerCotizacionActivity extends AppCompatActivity {
         listViewMaquinasCotizadas.addItemDecoration(itemDecoration);
     }
 
+    private void confirmarEnvio(){
+        AlertDialog alertDialog = new AlertDialog.Builder(VerCotizacionActivity.this).create();
+        alertDialog.setMessage("¿Desea solo guardar la cotización o enviarla ahora?");
+        alertDialog.setCancelable(false);
+        alertDialog.setCanceledOnTouchOutside(false);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Enviar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                enviar_guardar = "2";
+                showAlertDetallesCorreo();
+            }
+        });
+        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Guardar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                enviar_guardar = "1";
+                crear_cotizacion_WebService("","");
+                alertDialog_cargando = new AlertDialog.Builder(VerCotizacionActivity.this).create();
+                alertDialog_cargando.setMessage("Guardando datos");
+                alertDialog_cargando.setCancelable(false);
+                alertDialog_cargando.setCanceledOnTouchOutside(false);
+                alertDialog_cargando.show();
+            }
+        });
+        alertDialog.show();
 
-    private void crear_cotizacion_WebService(){
+    }
+
+
+    private void crear_cotizacion_WebService(final String asunto, final String cuerpo){
 
         String url = "https://golfyturf.com/feria_automovil/AppWebServices/crear_cotizacion_maquina.php";
         url = url.replace(" ", "%20");
@@ -168,7 +249,7 @@ public class VerCotizacionActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 if (error instanceof TimeoutError){
-                    Toast.makeText(VerCotizacionActivity.this, "Creación exitosa, un email será enviado en breve.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(VerCotizacionActivity.this, "Creación exitosa", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(VerCotizacionActivity.this,CotizacionesMaquinariaActivity.class);
                     startActivity(intent);
                 }
@@ -178,12 +259,18 @@ public class VerCotizacionActivity extends AppCompatActivity {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String,String> parametros = new HashMap<>();
                 long valor_total = 0;
+                parametros.put("Enviar_guardar", enviar_guardar);
+                parametros.put("Numero_cot", cotizacion_maquina.getNumero());
                 parametros.put("Id_cliente", idCliente );
                 parametros.put("Id_contacto", idContacto);
                 parametros.put("Id_comercial", Util.getId_usuario() );
+                parametros.put("Asunto", asunto );
+                parametros.put("Cuerpo", cuerpo );
                 parametros.put("Num_sub_cotizaciones", subCotizaciones.size()+ "" );
+                parametros.put("Moneda", Util.monedaActual+"");
                 for (int i=0; i<subCotizaciones.size(); i++){
                     SubCotizacion subCotizacion = subCotizaciones.get(i);
+                    parametros.put("Id_sub_cotizacion"+i, subCotizacion.getId()+"");
                     parametros.put("Id_modelo_maquina"+i, subCotizacion.getId_modelo_maquina() );
                     parametros.put("Valor"+i, subCotizacion.getValor()+"" );
                     valor_total += subCotizacion.getValor();
@@ -204,6 +291,7 @@ public class VerCotizacionActivity extends AppCompatActivity {
                         parametros.put("Cantidad"+i+j,componente.getCantidad()+ "");
                     }
                 }
+                parametros.put("Cantidad_contactos","0" );
                 parametros.put("Valor_total",valor_total+"");
 
                 return parametros;
